@@ -2,9 +2,12 @@
 
 namespace UI\Controller;
 
+use Application\Command\StoreTaskCommand;
 use Application\Controller\AbstractController;
 use Application\Query\ShowAllTasksQuery;
 
+use Application\Query\ShowTaskQuery;
+use Application\Command\UpdateTaskCommand;
 use Domain\Model\Entity\Task;
 use Domain\Model\ValueObject\TaskStatus;
 use Infrastructure\Service\TasksAttachedFilesService;
@@ -32,16 +35,16 @@ class TasksController extends AbstractController
 
         $title = htmlspecialchars($vars['task'], ENT_QUOTES, 'UTF-8');
         
-        $task = Task::findByTitle($title);
+        $query = new ShowTaskQuery($title);
+        
+        [$task, $files] = $this->tasksApplicationService->showTask($query);
 
-        if($task) {
+        if(is_null($task)) {
 
-            $files = glob('uploads/files/'.$task->id.'_*');
-
-            return $this->render('tasks/show', ['task' => $task, 'files' => $files, 'status_options' => TaskStatus::cases()]);
+            return '404 not found';
         }
 
-        return '404 not found';
+        return $this->render('tasks/show', ['task' => $task, 'files' => $files, 'status_options' => TaskStatus::cases()]);
     }
 
     public function update($vars): never
@@ -51,41 +54,33 @@ class TasksController extends AbstractController
 
             $task_id = htmlspecialchars($vars['task'], ENT_QUOTES, 'UTF-8');
     
-            $task = Task::find(intval($task_id));
+            $args = [
+                'title'         => FILTER_UNSAFE_RAW,
+                'description'   => FILTER_UNSAFE_RAW,
+                'status'        => FILTER_VALIDATE_INT,
+                'complete_date' => FILTER_UNSAFE_RAW,
+            ];
+    
+            $input = filter_input_array(INPUT_POST, $args);
+    
+            $title          = htmlspecialchars($input['title'], ENT_QUOTES, 'UTF-8');
+            $description    = htmlspecialchars($input['description'], ENT_QUOTES, 'UTF-8');
+            $complete_date  = \DateTime::createFromFormat('Y-m-d', datetime: $input['complete_date']);
+            $status         = TaskStatus::from($input['status']);
 
-            if($task) {
+            $command = new UpdateTaskCommand($task_id, $title, $description, $complete_date, $status);
 
-                $args = [
-                    'title'         => FILTER_UNSAFE_RAW,
-                    'description'   => FILTER_UNSAFE_RAW,
-                    'status'        => FILTER_VALIDATE_INT,
-                    'complete_date' => FILTER_UNSAFE_RAW,
-                ];
-        
-                $input = filter_input_array(INPUT_POST, $args);
-        
-                $title          = htmlspecialchars($input['title'], ENT_QUOTES, 'UTF-8');
-                $description    = htmlspecialchars($input['description'], ENT_QUOTES, 'UTF-8');
-                $complete_date  = \DateTime::createFromFormat('Y-m-d', datetime: $input['complete_date']);
-                $status         = TaskStatus::from($input['status']);
-
-                $task->title        = $title;
-                $task->description  = $description;
-                $task->completeDate = $complete_date;
-                $task->status       = $status;
-            
-                if (isset($_FILES['files'])) {
-                
-                    $tasksAttachFilesApplicationService = new TasksAttachedFilesService;
-
-                    $tasksAttachFilesApplicationService->attachFiles($task, $_FILES['files']);
-                }
-
-                $task->update();
-            }
+            $title = $this->tasksApplicationService->updateTask($command);
         }
 
-        header('Location: /tasks/'.$task['title']);
+        if(empty($title)) {
+
+            //TO-DO: resend to task not found page
+        } else {
+
+            header('Location: /tasks/'.$title);
+        }
+
         exit();
     }
 
@@ -112,16 +107,9 @@ class TasksController extends AbstractController
         $complete_date  = \DateTime::createFromFormat('Y-m-d', datetime: $input['complete_date']);
         $status         = TaskStatus::from($input['status']);
 
-        $task = new Task($title, $description, $complete_date, $status);
-        
-        $task->save();
+        $command = new StoreTaskCommand($title, $description, $complete_date, $status);
 
-        if (isset($_FILES['files'])) {
-
-            $tasksAttachFilesApplicationService = new TasksAttachedFilesService;
-
-            $tasksAttachFilesApplicationService->attachFiles($task, $_FILES['files']);
-        }
+        $this->tasksApplicationService->storeTask($command);
 
         header('Location: /tasks');
         exit();

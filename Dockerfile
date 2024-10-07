@@ -1,6 +1,7 @@
 FROM php:8.2-fpm
 RUN apt update \
-    && apt install -y git libicu-dev\
+    && apt install -y git libicu-dev libzip-dev \
+    && docker-php-ext-install zip \
     && docker-php-ext-install intl \
     && pecl install apcu \
     && docker-php-ext-enable apcu

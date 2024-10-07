@@ -68,7 +68,7 @@ class TasksController extends AbstractController
             $complete_date  = \DateTime::createFromFormat('Y-m-d', datetime: $input['complete_date']);
             $status         = TaskStatus::from($input['status']);
 
-            $command = new UpdateTaskCommand($task_id, $title, $description, $complete_date, $status);
+            $command = new UpdateTaskCommand(intval($task_id), $title, $description, $complete_date, $status);
 
             $title = $this->tasksApplicationService->updateTask($command);
         }

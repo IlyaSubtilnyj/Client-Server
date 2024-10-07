@@ -1,0 +1,14 @@
+# Composer files
+/vendor/
+/uploads/
+/composer.lock
+
+# Environment files
+.env
+
+# Log files
+*.log
+
+# Ignore build and cache directories
+/build/
+/cache/

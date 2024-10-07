@@ -1,0 +1,21 @@
+version: '3.9'
+services:
+  php:
+    container_name: csPHP
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/var/www/app
+    expose:
+      - 9000
+
+  nginx:
+    container_name: csNginx
+    build: ./nginx/
+    ports:
+      - "24135:80"
+    volumes:
+      - ./app:/var/www/app
+    depends_on:
+      - php

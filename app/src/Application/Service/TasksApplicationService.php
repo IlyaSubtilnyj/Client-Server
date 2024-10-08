@@ -18,6 +18,10 @@ class TasksApplicationService
         $this->taskCollectionService = new TaskCollectionService;
     }
 
+    /**
+     * @param \Application\Query\ShowAllTasksQuery $query
+     * @return array<Task>
+     */
     public function showAllTasks(ShowAllTasksQuery $query): array
     {
         $tasks = Task::all();
@@ -30,7 +34,10 @@ class TasksApplicationService
         return $tasks;
     }
 
-
+    /**
+     * @param \Application\Query\ShowTaskQuery $query
+     * @return array{0: Task|null, 1: array<string>|null} Returns a Task and an array of file paths.
+     */
     public function showTask(ShowTaskQuery $query): array
     {
 

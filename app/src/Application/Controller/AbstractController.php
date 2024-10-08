@@ -17,6 +17,11 @@ abstract class AbstractController
         $this->tasksApplicationService  = new TasksApplicationService;
     }
 
+    /**
+     * @param string $name
+     * @param array<string, mixed> $data
+     * @return string
+     */
     protected function render(string $name, array $data = array()): string  
     {
         return $this->__tmpls->render($name, $data);

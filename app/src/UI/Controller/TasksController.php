@@ -8,9 +8,7 @@ use Application\Query\ShowAllTasksQuery;
 
 use Application\Query\ShowTaskQuery;
 use Application\Command\UpdateTaskCommand;
-use Domain\Model\Entity\Task;
 use Domain\Model\ValueObject\TaskStatus;
-use Infrastructure\Service\TasksAttachedFilesService;
 
 class TasksController extends AbstractController
 {
@@ -30,6 +28,10 @@ class TasksController extends AbstractController
         return $this->render('tasks/index', data: ['tasks' => $tasks, 'selected_option' => $selectedFilter, 'status_options' => TaskStatus::cases()]);
     }
 
+    /**
+     * @param array<string> $vars
+     * @return string
+     */
     public function show($vars): string
     {
 
@@ -47,6 +49,10 @@ class TasksController extends AbstractController
         return $this->render('tasks/show', ['task' => $task, 'files' => $files, 'status_options' => TaskStatus::cases()]);
     }
 
+    /**
+     * @param array<string> $vars
+     * @return never
+     */
     public function update($vars): never
     {
 

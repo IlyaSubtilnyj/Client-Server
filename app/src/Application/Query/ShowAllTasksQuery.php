@@ -2,24 +2,29 @@
 
 namespace Application\Query;
 
+use Domain\Model\ValueObject\TaskStatus;
+
 class ShowAllTasksQuery
 {
+    /**
+     * @var array<string, TaskStatus>
+     */
     private ?array $filter = null;
-    // private $sort;
-    // private $pagination;
 
+    /**
+     * @param array<string, TaskStatus> $filter
+     */
     public function __construct(
-        ?array $filter      = null,
-        // mixed $sort         = null,
-        // mixed $pagination   = null,
+        ?array $filter,
     )
     {
         $this->filter       = $filter;
-        // $this->sort         = $sort;
-        // $this->pagination   = $pagination;
     }
 
-    public function getFilter()
+    /**
+     * @return array<string, TaskStatus>|null
+     */
+    public function getFilter(): array|null
     {
         return $this->filter;
     }

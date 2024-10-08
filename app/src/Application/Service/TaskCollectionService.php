@@ -1,12 +1,19 @@
 <?php
 
 namespace Application\Service;
+use Domain\Model\Entity\Task;
+use Domain\Model\ValueObject\TaskStatus;
 
-class TaskCollectionService
+final class TaskCollectionService
 {
-
+    /**
+     * @var array<Task>|null
+     */
     private ?array $__tasks = null;
 
+    /**
+     * @return array<Task>|null
+     */
     public function _(): ?array
     {
         $res = $this->__tasks;
@@ -14,13 +21,21 @@ class TaskCollectionService
         return $res;
     }
 
-    public function for(array $tasks): static
+    /**
+     * @param array<Task> $tasks
+     * @return self
+     */
+    public function for(array $tasks): self
     {
         $this->__tasks = $tasks;
         return $this;
     }
 
-    public function filter(array $map): static
+    /**
+     * @param array<string, TaskStatus> $map
+     * @return self
+     */
+    public function filter(array $map): self
     {
         $this->__tasks = array_filter($this->__tasks, function($task) use ($map) {
             $res = true;
@@ -31,7 +46,4 @@ class TaskCollectionService
         });
         return $this;
     }
-
-    public function sort() {}
-    public function paginate() {}
 }

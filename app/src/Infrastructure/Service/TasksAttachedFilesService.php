@@ -8,6 +8,11 @@ class TasksAttachedFilesService
 {
     private string $__uploadDir = 'uploads/files';
 
+    /**
+     * @param \Domain\Model\Entity\Task $task
+     * @param array<string, mixed> $files
+     * @return void
+     */
     public function attachFiles(Task $task, array $files): void
     {
 
@@ -30,7 +35,7 @@ class TasksAttachedFilesService
         }
     }
 
-    private function uploadDir() {
+    private function uploadDir(): string {
 
         return implode(DIRECTORY_SEPARATOR, [$_SERVER['DOCUMENT_ROOT'], $this->__uploadDir]);
     }

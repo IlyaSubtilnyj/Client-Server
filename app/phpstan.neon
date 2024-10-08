@@ -1,4 +1,4 @@
 parameters:
-       level: 5  # You can set the level from 0 (least strict) to 8 (most strict)
+       level: 6  # You can set the level from 0 (least strict) to 8 (most strict)
        paths:
            - src  # Specify the directories to analyze

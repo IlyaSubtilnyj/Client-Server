@@ -4,16 +4,26 @@ namespace Domain\Model\Entity;
 
 use Domain\Model\ValueObject\TaskStatus;
 
+/**
+ * Class Task
+ * 
+ * @phpstan-ignore missingType.generics
+ */
 class Task implements \ArrayAccess
 {
-    private static $db;
     public ?int         $id             = null;
     public ?string      $title          = null;
     public ?string      $description    = null;
     public ?\DateTime   $completeDate   = null;
     public ?TaskStatus  $status         = null;
 
-    public function __construct($title, $description, $complete_date, $status)
+
+    public function __construct(
+        string $title, 
+        ?string $description, 
+        ?\DateTime $complete_date, 
+        TaskStatus $status
+    )
     {
         $this->title            = $title;
         $this->description      = $description;
@@ -21,10 +31,11 @@ class Task implements \ArrayAccess
         $this->status           = $status;
     }
 
-    public static function setDatabase($database) {
-        self::$db = $database;
-    }
-
+    /**
+     * Find all Tasks.
+     * 
+     * @return array<static> Returns all found Tasks.
+     */
     public static function all(): array {
 
         $uploadDir = $_SERVER['DOCUMENT_ROOT'].'/uploads/tasks';
@@ -44,7 +55,13 @@ class Task implements \ArrayAccess
         }
     }
 
-    public static function find(int $id): ?Task
+    /**
+     * Find a Task by its ID.
+     * 
+     * @param int $id The ID to search for.
+     * @return static|null Returns the Task instance or null if not found.
+     */
+    public static function find(int $id): ?self
     {
         $tasks = self::all();
 
@@ -58,7 +75,13 @@ class Task implements \ArrayAccess
         return $tasks[$key];
     }
 
-    public static function findByTitle(string $title): ?Task
+    /**
+     * Find Task by its title.
+     * 
+     * @param string $title
+     * @return static|null Returns the Task instance or null if not found.
+     */
+    public static function findByTitle(string $title): ?self
     {
         
         $tasks = self::all();
